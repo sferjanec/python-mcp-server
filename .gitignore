@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# Node / Inspector
+node_modules/
+.npm
+npm-debug.log*
+
+# Environment & Secrets
+.env
+.env.local
+.gemini/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# Project Specific
+developer_log.md
+src/assets/data/*.json

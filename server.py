@@ -1,6 +1,7 @@
 from mcp.server.fastmcp import FastMCP
 from datetime import datetime
 import os
+import sympy as sp;
 
 mcp = FastMCP("DevAgentToolkit")
 
@@ -103,6 +104,34 @@ def append_developer_log(change_description: str, files_affected: str) -> str:
     except Exception as e:
         return f"Error updating log: {str(e)}"
 
+@mcp.tool()
+def calculate_multivariable_complexity(lines: int, max_nesting: int) -> str:
+    """
+    Calculates complexity using a multivariable limit.
+    x = lines (limit 300)
+    y = nesting depth (limit 5)
+    """
+    x, y = sp.symbols('x y')
+    
+    # Complexity function: As x -> 300 OR y -> 5, the denominator -> 0
+    # and the total complexity spikes to infinity.
+    f = 1 / ((300 - x) * (5 - y))
+    
+    # Calculate the value at current state
+    try:
+        # We substitute the current values to find the "Point Complexity"
+        current_complexity = f.subs({x: lines, y: max_nesting})
+        
+        # If the denominator was 0 or negative, SymPy handles the infinity
+        score = float(current_complexity)
+        
+        status = "HEALTHY"
+        if score > 0.05: status = "WARNING: HIGH COGNITIVE LOAD"
+        if score > 0.20 or lines >= 300 or max_nesting >= 5: status = "CRITICAL: REFACTOR IMMEDIATELY"
+        
+        return f"Lines: {lines}, Nesting: {max_nesting} | Complexity Score: {score:.4f} | Status: {status}"
+    except Exception:
+        return "CRITICAL: Limit Exceeded (Division by Zero logic)"
     
 if __name__ == "__main__":
     mcp.run(transport="stdio")
